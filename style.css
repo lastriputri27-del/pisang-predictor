@@ -1,0 +1,281 @@
+/* =========================
+   RESET & GLOBAL
+========================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', 'Poppins', sans-serif;
+}
+
+body {
+  background: linear-gradient(135deg, #fffdf5, #ffe9a7);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* =========================
+   CONTAINER
+========================= */
+.container {
+  width: 95%;
+  max-width: 1000px;
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 30px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+  transition: 0.3s;
+}
+
+/* =========================
+   HEADER
+========================= */
+header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+header h1 {
+  color: #f9a825;
+  font-size: 30px;
+  font-weight: 700;
+}
+
+header p {
+  color: #777;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+/* =========================
+   UPLOAD SECTION
+========================= */
+.upload-section {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 25px;
+}
+
+.file-upload label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 240px;
+  height: 160px;
+  border: 2px dashed #fbc02d;
+  border-radius: 18px;
+  cursor: pointer;
+  transition: 0.3s;
+  background: #fffef8;
+}
+
+.file-upload label:hover {
+  background: #fff9d6;
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.file-upload i {
+  font-size: 42px;
+  color: #f9a825;
+  margin-bottom: 10px;
+}
+
+.file-upload p {
+  color: #666;
+}
+
+/* =========================
+   LOADING
+========================= */
+#processingContainer {
+  margin: 20px 0;
+  font-weight: 600;
+  color: #f57f17;
+  text-align: center;
+}
+
+/* =========================
+   CAMERA
+========================= */
+.camera-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 25px;
+}
+
+/* Video biar lebih clean dan center */
+.camera-section video {
+  width: 100%;
+  max-width: 700px; /* dibesarin */
+  border-radius: 18px;
+  margin-top: 10px;
+  box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+}
+
+
+/* Tombol biar ikut center */
+.camera-section button {
+  padding: 10px 18px;
+  margin: 6px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f9a825, #f57f17);
+  color: white;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.camera-section button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+}
+
+
+/* =========================
+   RESULTS
+========================= */
+.results-container {
+  margin-top: 25px;
+}
+
+.image-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 25px;
+}
+
+.image-card {
+  background: #fffef8;
+  padding: 15px;
+  border-radius: 18px;
+  text-align: center;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+  transition: 0.3s;
+}
+
+.image-card:hover {
+  transform: translateY(-5px);
+}
+
+.image-card h3 {
+  margin-bottom: 10px;
+  color: #f9a825;
+}
+
+canvas {
+  width: 100%;
+  border-radius: 12px;
+}
+
+/* =========================
+   PREDICTION
+========================= */
+.prediction-main {
+  text-align: center;
+}
+
+.prediction-main h2 {
+  margin-bottom: 15px;
+  color: #f57f17;
+}
+
+/* BOX HASIL */
+.prediction-box {
+  background: linear-gradient(135deg, #ffd54f, #fbc02d);
+  color: white;
+  padding: 25px;
+  border-radius: 25px;
+  margin-bottom: 15px;
+  box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+  transition: 0.3s;
+}
+
+.prediction-box:hover {
+  transform: scale(1.02);
+}
+
+.prediction-box p {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.prediction-box h1 {
+  font-size: 55px;
+  margin: 5px 0;
+}
+
+/* STATUS */
+.prediction-status {
+  padding: 12px;
+  border-radius: 12px;
+  font-weight: 600;
+  background: #fff8e1;
+  color: #8a6d00;
+  box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+}
+
+/* =========================
+   HISTORY
+========================= */
+.history-container {
+  margin-top: 30px;
+}
+
+.history-container h2 {
+  text-align: center;
+  color: #f57f17;
+  margin-bottom: 15px;
+}
+
+#historyList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fffef8;
+  padding: 12px;
+  border-radius: 12px;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+  transition: 0.3s;
+}
+
+.history-item:hover {
+  transform: translateX(5px);
+}
+
+.history-item img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.history-info {
+  font-size: 14px;
+  color: #555;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 768px) {
+  .image-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .prediction-box h1 {
+    font-size: 42px;
+  }
+}

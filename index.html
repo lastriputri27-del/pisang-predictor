@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Prediksi Umur Pisang Ambon</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <!-- FONT -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <!-- ICON -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- EXCEL -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- ================= HEADER ================= -->
+  <header>
+    <h1><i class="fas fa-banana"></i> Prediksi Sisa Umur Pisang Ambon </h1>
+    <p>Analisis kematangan dan prediksi umur simpan pisang secara cerdas</p>
+  </header>
+
+  <!-- ================= UPLOAD ================= -->
+  <div class="upload-section">
+    <div class="file-upload">
+      <input type="file" id="imageInput" accept="image/*">
+      <label for="imageInput">
+        <i class="fas fa-cloud-upload-alt"></i>
+        <span>Upload Gambar Pisang</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- ================= CAMERA ================= -->
+  <div class="camera-section">
+    <button id="startCamera"><i class="fas fa-camera"></i> Buka Kamera</button>
+    <button id="captureImage"><i class="fas fa-image"></i> Ambil Gambar</button>
+    <video id="video" autoplay></video>
+  </div>
+
+  <!-- ================= LOADING ================= -->
+  <div id="processingContainer" style="display:none">
+    <p class="loading-text">🔄 Memproses Gambar...</p>
+  </div>
+
+  <!-- ================= HASIL ================= -->
+  <div class="results-container" id="resultsContainer" style="display:none">
+
+    <!-- ===== PREVIEW ===== -->
+    <div class="image-grid">
+      <div class="image-card">
+        <h3><i class="fas fa-image"></i> Gambar Asli</h3>
+        <canvas id="originalCanvas"></canvas>
+      </div>
+
+      <div class="image-card">
+        <h3><i class="fas fa-project-diagram"></i> Segmentasi</h3>
+        <canvas id="segmentedCanvas"></canvas>
+      </div>
+    </div>
+
+    <!-- ===== HASIL UTAMA ===== -->
+    <div class="prediction-main">
+
+      <h2>✨ Hasil Analisis</h2>
+
+      <div class="prediction-box">
+        <p>Sisa Umur</p>
+        <h1 id="predictedAge">-</h1>
+        <p>Hari</p>
+      </div>
+
+      <div class="prediction-status" id="statusText">-</div>
+
+      <!-- ACTION -->
+      <div class="action-buttons">
+        <button onclick="downloadExcel()">
+          <i class="fas fa-file-excel"></i> Download Excel
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= HISTORY ================= -->
+  <div class="history-container">
+    <h2><i class="fas fa-clock"></i> Riwayat Prediksi</h2>
+
+    <div id="historyList"></div>
+
+    <div style="text-align:center; margin-top:10px;">
+      <button onclick="clearHistory()">
+        <i class="fas fa-trash"></i> Hapus Riwayat
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ================= SCRIPT ================= -->
+<script src="script.js"></script>
+
+</body>
+</html>
