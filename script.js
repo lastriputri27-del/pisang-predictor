@@ -260,13 +260,13 @@ function processImage() {
 });
 async function removeBackground(file) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 5000); // 5 detik
+ const timeout = setTimeout(() => controller.abort(), 60000); 
 
   const formData = new FormData();
   formData.append("image", file);
 
   try {
-    const response = await fetch("http://127.0.0.1:5000/remove-bg", {
+    const response = await fetch('https://banana-predictor.onrender.com/remove-bg', {
       method: "POST",
       body: formData,
       signal: controller.signal
