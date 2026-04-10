@@ -7,23 +7,19 @@ import io
 app = Flask(__name__)
 CORS(app)
 
-@app.route("/api/remove-bg", methods=["POST"])
+@app.route("/remove-bg", methods=["POST"])
 def remove_bg():
-    file = request.files.get("image")
-
-    if not file:
-        return {"error": "No image uploaded"}, 400
+    file = request.files["image"]
 
     input_image = Image.open(file.stream).convert("RGBA")
+
     output = remove(input_image)
 
     img_io = io.BytesIO()
-    output.save(img_io, format="PNG")
+    output.save(img_io, 'PNG')
     img_io.seek(0)
 
-    return send_file(img_io, mimetype="image/png")
+    return send_file(img_io, mimetype='image/png')
 
-
-# 🔥 INI YANG PENTING (entry point Vercel)
-def handler(environ, start_response):
-    return app(environ, start_response)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000, debug=True)
