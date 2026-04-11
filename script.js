@@ -221,4 +221,6 @@ function processImage() {
 
   processingContainer.style.display = "none";
   resultsContainer.style.display = "block";
+
+  saveToHistory(originalCanvas.toDataURL(), age.toFixed(1), status);
 }
