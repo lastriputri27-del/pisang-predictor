@@ -1,5 +1,5 @@
 // ================================
-// PISANG AMBON - FIX NO API
+// PISANG AMBON - FINAL NO API + BG REMOVAL + HISTORY
 // ================================
 
 // ============================
@@ -54,7 +54,6 @@ captureBtn.addEventListener("click", () => {
   canvas.height = video.videoHeight;
   ctx.drawImage(video, 0, 0);
 
-  // matikan kamera
   if (video.srcObject) {
     video.srcObject.getTracks().forEach(track => track.stop());
     video.srcObject = null;
@@ -64,7 +63,7 @@ captureBtn.addEventListener("click", () => {
 });
 
 // ============================
-// UPLOAD (NO API)
+// UPLOAD
 // ============================
 imageInput.addEventListener("change", function () {
   const file = this.files[0];
@@ -102,7 +101,34 @@ function drawAndProcess(img) {
   segmentedCanvas.height = img.height;
 
   ctxOriginal.drawImage(img, 0, 0);
+  removeBackgroundManual();
   processImage();
+}
+
+// ============================
+// BG REMOVAL MANUAL (SIMPLE)
+// ============================
+function removeBackgroundManual() {
+  const width = originalCanvas.width;
+  const height = originalCanvas.height;
+
+  const imageData = ctxOriginal.getImageData(0, 0, width, height);
+  const data = imageData.data;
+
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i];
+    const g = data[i + 1];
+    const b = data[i + 2];
+
+    const [h, s, v] = rgbToHsv(r, g, b);
+
+    // hapus background (putih / gelap / abu)
+    if (v > 95 || v < 20 || s < 10) {
+      data[i + 3] = 0; // transparan
+    }
+  }
+
+  ctxOriginal.putImageData(imageData, 0, 0);
 }
 
 // ============================
@@ -167,13 +193,13 @@ function processImage() {
   let bananaPixels = 0, brownPixels = 0;
 
   for (let i = 0; i < data.length; i += 4) {
+    if (data[i + 3] === 0) continue; // skip background
+
     const r = data[i];
     const g = data[i + 1];
     const b = data[i + 2];
 
     const [h, s, v] = rgbToHsv(r, g, b);
-
-    if (v < 15 || v > 98 || s < 10) continue;
 
     const isYellow = (h >= 25 && h <= 65 && s > 30 && v > 50);
     const isBrown = (h >= 10 && h <= 35 && s > 20 && v > 20 && v < 70);
@@ -219,8 +245,57 @@ function processImage() {
   predictedAge.innerText = age.toFixed(1);
   statusText.innerText = status;
 
+  saveToHistory(originalCanvas.toDataURL(), age.toFixed(1), status);
+
   processingContainer.style.display = "none";
   resultsContainer.style.display = "block";
-
-  saveToHistory(originalCanvas.toDataURL(), age.toFixed(1), status);
 }
+
+// ============================
+// HISTORY
+// ============================
+let historyData = JSON.parse(localStorage.getItem("bananaHistory")) || [];
+
+function saveToHistory(image, age, status) {
+  historyData.unshift({
+    image,
+    age,
+    status,
+    fileName: currentFileName,
+    date: new Date().toLocaleString()
+  });
+
+  if (historyData.length > 10) historyData.pop();
+
+  localStorage.setItem("bananaHistory", JSON.stringify(historyData));
+  renderHistory();
+}
+
+function renderHistory() {
+  if (!historyList) return;
+
+  historyList.innerHTML = "";
+
+  historyData.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "history-item";
+
+    div.innerHTML = `
+      <img src="${item.image}">
+      <div>
+        <b>${item.age} hari</b> - ${item.status}<br>
+        <small>${item.fileName}</small><br>
+        <small>${item.date}</small>
+      </div>
+    `;
+
+    historyList.appendChild(div);
+  });
+}
+
+// ============================
+// INIT
+// ============================
+window.onload = () => {
+  renderHistory();
+};
