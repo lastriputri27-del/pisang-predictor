@@ -7,6 +7,9 @@ import os  # <--- Ini wajib ditambah agar bisa baca port dari Render
 
 app = Flask(__name__)
 CORS(app)
+@app.route("/")
+def home():
+    return "API Remove Background is running"
 
 @app.route("/remove-bg", methods=["POST"])
 def remove_bg():
