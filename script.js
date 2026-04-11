@@ -1,5 +1,5 @@
 // ================================
-// PISANG AMBON - FINAL CLEAN + EXCEL + NAMA FILE
+// PISANG AMBON - FIX NO API
 // ================================
 
 // ============================
@@ -24,9 +24,6 @@ const historyList = document.getElementById("historyList");
 let ctxOriginal = originalCanvas.getContext("2d");
 let ctxSegment = segmentedCanvas.getContext("2d");
 
-// ============================
-// VARIABEL TAMBAHAN
-// ============================
 let currentFileName = "Kamera";
 
 // ============================
@@ -47,72 +44,8 @@ startCameraBtn.addEventListener("click", async () => {
   }
 });
 
-// ============================
-// UPLOAD IMAGE
-// ============================
-imageInput.addEventListener("change", async function () {
-  const file = this.files[0];
-  if (!file) return;
-
-  currentFileName = file.name; // ✅ ambil nama file
-
-  processingContainer.style.display = "block";
-  resultsContainer.style.display = "none";
-
-  try {
-    const processedImageURL = await removeBackground(file);
-    const img = new Image();
-
-    img.onload = function () {
-      originalCanvas.width = img.width;
-      originalCanvas.height = img.height;
-      segmentedCanvas.width = img.width;
-      segmentedCanvas.height = img.height;
-
-      ctxOriginal.drawImage(img, 0, 0);
-      processImage();
-    };
-
-    img.src = processedImageURL;
-
-  } catch (err) {
-    console.error(err);
-    processingContainer.style.display = "none";
-  }
-});
-
-// ============================
-// HANDLE IMAGE (CAMERA)
-// ============================
-function handleImage(canvas) {
-  processingContainer.style.display = "block";
-  resultsContainer.style.display = "none";
-
-  canvas.toBlob(async (blob) => {
-    try {
-      const processedImageURL = await removeBackground(blob);
-      const img = new Image();
-
-      img.onload = function () {
-        originalCanvas.width = img.width;
-        originalCanvas.height = img.height;
-        segmentedCanvas.width = img.width;
-        segmentedCanvas.height = img.height;
-
-        ctxOriginal.drawImage(img, 0, 0);
-        processImage();
-      };
-
-      img.src = processedImageURL;
-
-    } catch (err) {
-      console.error(err);
-      processingContainer.style.display = "none";
-    }
-  }, "image/png");
-}
 captureBtn.addEventListener("click", () => {
-  currentFileName = "Kamera_" + new Date().getTime();
+  currentFileName = "Kamera_" + Date.now();
 
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
@@ -121,7 +54,7 @@ captureBtn.addEventListener("click", () => {
   canvas.height = video.videoHeight;
   ctx.drawImage(video, 0, 0);
 
-  // ❗ MATIKAN KAMERA
+  // matikan kamera
   if (video.srcObject) {
     video.srcObject.getTracks().forEach(track => track.stop());
     video.srcObject = null;
@@ -131,24 +64,45 @@ captureBtn.addEventListener("click", () => {
 });
 
 // ============================
-// REMOVE BACKGROUND
+// UPLOAD (NO API)
 // ============================
-async function removeBackground(file) {
-  const formData = new FormData();
-  formData.append("image", file);
+imageInput.addEventListener("change", function () {
+  const file = this.files[0];
+  if (!file) return;
 
-  const response = await fetch("http://127.0.0.1:5000/remove-bg", {
-    method: "POST",
-    body: formData
-  });
+  currentFileName = file.name;
 
-  if (!response.ok) {
-    alert("Server Python belum jalan!");
-    throw new Error("Server error");
-  }
+  processingContainer.style.display = "block";
+  resultsContainer.style.display = "none";
 
-  const blob = await response.blob();
-  return URL.createObjectURL(blob);
+  const img = new Image();
+  img.onload = () => drawAndProcess(img);
+  img.src = URL.createObjectURL(file);
+});
+
+// ============================
+// HANDLE IMAGE
+// ============================
+function handleImage(canvas) {
+  processingContainer.style.display = "block";
+  resultsContainer.style.display = "none";
+
+  const img = new Image();
+  img.onload = () => drawAndProcess(img);
+  img.src = canvas.toDataURL("image/png");
+}
+
+// ============================
+// DRAW + PROCESS
+// ============================
+function drawAndProcess(img) {
+  originalCanvas.width = img.width;
+  originalCanvas.height = img.height;
+  segmentedCanvas.width = img.width;
+  segmentedCanvas.height = img.height;
+
+  ctxOriginal.drawImage(img, 0, 0);
+  processImage();
 }
 
 // ============================
@@ -181,11 +135,11 @@ function rgbToHsv(r, g, b) {
 // ============================
 function predictBananaAge(h, s, v, brown, area) {
   let age = INTERCEPT +
-    (COEF.H * h) +
-    (COEF.S * s) +
-    (COEF.V * v) +
-    (COEF.B * brown) +
-    (COEF.A * area);
+    COEF.H * h +
+    COEF.S * s +
+    COEF.V * v +
+    COEF.B * brown +
+    COEF.A * area;
 
   return Math.max(0, Math.min(age, 7));
 }
@@ -212,83 +166,6 @@ function processImage() {
   let totalHue = 0, totalSat = 0, totalVal = 0;
   let bananaPixels = 0, brownPixels = 0;
 
-  imageInput.addEventListener("change", async function () {
-  const file = this.files[0];
-  if (!file) return;
-
-  currentFileName = file.name;
-
-  processingContainer.style.display = "block";
-  resultsContainer.style.display = "none";
-
-  try {
-    let processedImageURL;
-
-    try {
-      // coba pakai backend
-      processedImageURL = await removeBackground(file);
-    } catch {
-      // fallback: pakai gambar asli
-      console.warn("Background removal gagal, pakai gambar asli");
-      processedImageURL = URL.createObjectURL(file);
-    }
-
-    const img = new Image();
-
-    img.onload = function () {
-      originalCanvas.width = img.width;
-      originalCanvas.height = img.height;
-      segmentedCanvas.width = img.width;
-      segmentedCanvas.height = img.height;
-
-      ctxOriginal.drawImage(img, 0, 0);
-      processImage();
-    };
-
-    img.onerror = function () {
-      alert("❌ Gagal load gambar");
-      processingContainer.style.display = "none";
-    };
-
-    img.src = processedImageURL;
-
-  } catch (err) {
-    console.error(err);
-    alert("❌ Terjadi error saat proses gambar");
-    processingContainer.style.display = "none";
-  }
-});
-async function removeBackground(file) {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 5000); // 5 detik
-
-  const formData = new FormData();
-  formData.append("image", file);
-
-  try {
-    const response = await fetch("http://127.0.0.1:5000/remove-bg", {
-      method: "POST",
-      body: formData,
-      signal: controller.signal
-    });
-
-    clearTimeout(timeout);
-
-    if (!response.ok) throw new Error("Server error");
-
-    const blob = await response.blob();
-    return URL.createObjectURL(blob);
-
-  } catch (err) {
-    clearTimeout(timeout);
-    throw err;
-  }
-}
-
-
-  // =========================
-  // STEP 1: SEGMENTASI LEBIH STABIL
-  // =========================
   for (let i = 0; i < data.length; i += 4) {
     const r = data[i];
     const g = data[i + 1];
@@ -296,19 +173,13 @@ async function removeBackground(file) {
 
     const [h, s, v] = rgbToHsv(r, g, b);
 
-    // Filter background lebih longgar biar tidak hilang
-    if (v < 15 || v > 98 || s < 10) {
-      segData[i + 3] = 0;
-      continue;
-    }
+    if (v < 15 || v > 98 || s < 10) continue;
 
-    // Threshold diperbaiki
     const isYellow = (h >= 25 && h <= 65 && s > 30 && v > 50);
     const isBrown = (h >= 10 && h <= 35 && s > 20 && v > 20 && v < 70);
 
     if (isYellow || isBrown) {
       bananaPixels++;
-
       totalHue += h;
       totalSat += s;
       totalVal += v;
@@ -325,162 +196,29 @@ async function removeBackground(file) {
       }
 
       segData[i + 3] = 255;
-    } else {
-      segData[i + 3] = 0;
     }
   }
 
-  // =========================
-  // STEP 2: VALIDASI AWAL (ANTI ERROR)
-  // =========================
   if (bananaPixels < 300) {
-    alert("❌ Gambar tidak jelas atau bukan pisang");
-    processingContainer.style.display = "none";
-    return;
-  }
-
-  const totalPixels = width * height;
-  const areaRatio = bananaPixels / totalPixels;
-  const yellowRatio = (bananaPixels - brownPixels) / bananaPixels;
-
-  // =========================
-  // STEP 3: VALIDASI PISANG (LEBIH KETAT)
-  // =========================
-
-  if (areaRatio < 0.03) {
-    alert("❌ Objek terlalu kecil, bukan pisang");
-    processingContainer.style.display = "none";
-    return;
-  }
-
-  if (yellowRatio < 0.25) {
-    alert("❌ Warna tidak sesuai pisang");
-    processingContainer.style.display = "none";
-    return;
-  }
-
-  // Tambahan: pisang biasanya cukup terang
-  const avgValTemp = totalVal / bananaPixels;
-  if (avgValTemp < 40) {
-    alert("❌ Gambar terlalu gelap");
+    alert("❌ Bukan pisang / tidak jelas");
     processingContainer.style.display = "none";
     return;
   }
 
   ctxSegment.putImageData(segmented, 0, 0);
 
-  // =========================
-  // STEP 4: HITUNG FITUR (AMAN)
-  // =========================
   const avgHue = totalHue / bananaPixels;
   const avgSat = totalSat / bananaPixels;
   const avgVal = totalVal / bananaPixels;
   const brownRatio = (brownPixels / bananaPixels) * 100;
-  const area = areaRatio;
+  const area = bananaPixels / (width * height);
 
-  // =========================
-  // STEP 5: PREDIKSI (STABIL)
-  // =========================
-  let age = predictBananaAge(avgHue, avgSat, avgVal, brownRatio, area);
-
-  if (isNaN(age)) age = 0;
-
+  const age = predictBananaAge(avgHue, avgSat, avgVal, brownRatio, area);
   const status = getBananaStatus(age);
 
   predictedAge.innerText = age.toFixed(1);
   statusText.innerText = status;
 
-  saveToHistory(originalCanvas.toDataURL(), age.toFixed(1), status);
-
   processingContainer.style.display = "none";
   resultsContainer.style.display = "block";
 }
-
-
-// ============================
-// HISTORY
-// ============================
-let historyData = JSON.parse(localStorage.getItem("bananaHistory")) || [];
-
-function saveToHistory(image, age, status) {
-  historyData.unshift({
-    image,
-    age,
-    status,
-    fileName: currentFileName,
-    date: new Date().toLocaleString()
-  });
-
-  if (historyData.length > 10) historyData.pop();
-
-  localStorage.setItem("bananaHistory", JSON.stringify(historyData));
-  renderHistory();
-}
-
-function renderHistory() {
-  if (!historyList) return;
-
-  historyList.innerHTML = "";
-
-  historyData.forEach(item => {
-    const div = document.createElement("div");
-    div.className = "history-item";
-
-    div.innerHTML = `
-      <img src="${item.image}">
-      <div>
-        <b>${item.age} hari</b> - ${item.status}<br>
-        <small>${item.fileName}</small><br>
-        <small>${item.date}</small>
-      </div>
-    `;
-
-    historyList.appendChild(div);
-  });
-}
-
-function clearHistory() {
-  localStorage.removeItem("bananaHistory");
-  historyData = [];
-  renderHistory();
-}
-
-// ============================
-// DOWNLOAD EXCEL
-// ============================
-function downloadExcel() {
-  if (historyData.length === 0) {
-    alert("Belum ada data!");
-    return;
-  }
-
-  const data = historyData.map((item, i) => ({
-    No: i + 1,
-    "Nama File": item.fileName,
-    Tanggal: item.date,
-    Umur: item.age,
-    Status: item.status
-  }));
-
-  const ws = XLSX.utils.json_to_sheet(data);
-
-  ws["!cols"] = [
-    { wch: 5 },
-    { wch: 25 },
-    { wch: 20 },
-    { wch: 10 },
-    { wch: 20 }
-  ];
-
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Laporan");
-
-  XLSX.writeFile(wb, "laporan_pisang.xlsx");
-}
-
-// ============================
-// INIT
-// ============================
-window.onload = () => {
-  renderHistory();
-};
